@@ -96,9 +96,9 @@ let settings = {
     "FmbFl8HXLIX2znZibIo_k6QNCj63DCm0Y5jhwpvEogjlNmuRcZi7xNk38npKpk8X4p_6apxx6OQIQ57tigLAxv8pccyuSSUTXTBCAV1yOj9fGEXlhVkzFta0KPDuTKMIN6FSqHXfnSOOzkHU0LXimQdWN7PhHLRjRfinSbE8GlC-DBa5sQTKtJlQdlysgTA0LjHWd9Xc2VLw0jyCXXXXXX",
 };
 
-let records;
-let flag = false;
 async function onBatch(events, settings) {
+  let records;
+  let flag = false;
   //S3 connection
   const ID = settings.accessKeyId;
   const SECRET = settings.secretAccessKey;
@@ -250,8 +250,4 @@ function setMinutes() {
   if (digit >= 0 && digit <= 1) return date + "00/" + unix + ".csv";
   else if (digit >= 2 && digit <= 3) return date + "20/" + unix + ".csv";
   else return date + "40/" + unix + ".csv";
-}
-
-function getRandomInt(max) {
-  return Math.floor(Math.random() * max);
 }
