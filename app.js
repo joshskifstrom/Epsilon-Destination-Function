@@ -83,17 +83,17 @@ let events = [
   },
 ];
 
-let logged_event = JSON.stringify(events, null, 2);
-//console.log(logged_event);
+let string_event = JSON.stringify(events);
+console.log(string_event);
 
 let settings = {
-  s3Bucket: "nike-XXX",
+  s3Bucket: "nike-epsilon-dev",
   s3BucketRegion: "us-west-2",
-  accessKeyId: "AKIAQ3G6WPXXXX",
-  secretAccessKey: "VLD4TEv6deArvoYbZXXXX",
-  personasSpaceId: "spa_1bsKVj68gbOu4d0zGtG5pBsMGKw",
+  accessKeyId: "AKIAQ3G6WPXxxxx",
+  secretAccessKey: "VLD4TEv6deArvoYbZaWizUjJRuxxxx",
+  personasSpaceId: "spa_1bsKVj68gbOu4d0zGxxx",
   personasProfileApiKey:
-    "FmbFl8HXLIX2znZibIo_k6QNCj63DCm0Y5jhwpvEogjlNmuRcZi7xNk38npKpk8X4p_6apxx6OQIQ57tigLAxv8pccyuSSUTXTBCAV1yOj9fGEXlhVkzFta0KPDuTKMIN6FSqHXfnSOOzkHU0LXimQdWN7PhHLRjRfinSbE8GlC-DBa5sQTKtJlQdlysgTA0LjHWd9Xc2VLw0jyCXXXXXX",
+    "FmbFl8HXLIX2znZibIo_k6QNCj63DCm0Y5jhwpvEogjlNmuRcZi7xNk38npKpk8X4p_6apxx6OQIQ57tigLAxv8pccyuSSUTXTBCAV1yOj9fGEXlhVkzFta0KPDuTKMIN6FSqxABIKWljLX6bx2NgXX14nZPRzexxx",
 };
 
 async function onBatch(events, settings) {
@@ -102,8 +102,8 @@ async function onBatch(events, settings) {
   //S3 connection
   const ID = settings.accessKeyId;
   const SECRET = settings.secretAccessKey;
-  const BUCKET = settings.s3Bucket; // setting.bucket
-  const REGION = settings.s3BucketRegion; //settings.region;
+  const BUCKET = settings.s3Bucket;
+  const REGION = settings.s3BucketRegion;
   // Connect to S3
   var credentials = new AWS.Credentials({
     accessKeyId: ID,
@@ -116,6 +116,7 @@ async function onBatch(events, settings) {
   AWS.config.update(config);
   var s3 = new AWS.S3();
 
+  //iterate through onBatch events
   for (const event of events) {
     let userId = event.userId;
     let user_email;
@@ -130,6 +131,7 @@ async function onBatch(events, settings) {
       "audience_key_value",
     ];
 
+    //collect phone from profile api
     let personas_url = `https://profiles.segment.com/v1/spaces/${settings.personasSpaceId}/collections/users/profiles/user_id:${userId}/external_ids?limit=25`;
     console.log(personas_url);
     let profile_api_request = await fetch(personas_url, {
@@ -143,7 +145,10 @@ async function onBatch(events, settings) {
       let external_ids_json = await profile_api_request.json();
 
       //collect email from events object and hash
-      user_email = sha256Hash(event.traits.email.toLowerCase()).toUpperCase();
+      //if user doesn't have phone, default to null otherwise hash
+      if (user_email == undefined) user_email = null;
+      else
+        user_email = sha256Hash(event.traits.email.toLowerCase()).toUpperCase();
 
       //collect first phone number from profile api array
       user_phone = external_ids_json.data.find((data) => data.type == "phone");
@@ -236,7 +241,7 @@ function sha256Hash(value) {
     .toLocaleLowerCase();
 }
 
-//assigns file name in date-time -- defaults to 00, 20, 40 minute filename intervals
+//assigns directory name in 20 minutes chunks 'yyyy-mm-ddThh:mm/' - filename in unix time '1658520411394.csv'
 function setMinutes() {
   let date = moment().format();
   let minutes = JSON.stringify(moment(date, false).get("minutes"));
@@ -251,3 +256,4 @@ function setMinutes() {
   else if (digit >= 2 && digit <= 3) return date + "20/" + unix + ".csv";
   else return date + "40/" + unix + ".csv";
 }
+
