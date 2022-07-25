@@ -256,5 +256,3 @@ function setMinutes() {
   else if (digit >= 2 && digit <= 3) return date + "20/" + unix + ".csv";
   else return date + "40/" + unix + ".csv";
 }
-
-
