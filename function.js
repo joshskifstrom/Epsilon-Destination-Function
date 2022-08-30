@@ -153,7 +153,10 @@ function setMinutes() {
 	let digit = minutes.substring(0, 1);
 	let unix = Date.now();
 
-	if (digit >= 0 && digit <= 1) return date + '00/' + unix + '.csv';
-	else if (digit >= 2 && digit <= 3) return date + '20/' + unix + '.csv';
-	else return date + '40/' + unix + '.csv';
+	if (digit == 0) return date + '00/' + unix + '.csv';
+	else if (digit == 1) return date + '10/' + unix + '.csv';
+	else if (digit == 2) return date + '20/' + unix + '.csv';
+	else if (digit == 3) return date + '30/' + unix + '.csv';
+	else if (digit == 4) return date + '40/' + unix + '.csv';
+	else return date + '50/' + unix + '.csv';
 }
